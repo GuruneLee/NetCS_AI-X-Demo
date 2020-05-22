@@ -1,0 +1,8 @@
+[2020-04-17 21:08:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2020-04-17 21:09:27,095] INFO [ProducerStateManager partition=video3-0] Writing producer snapshot at offset 1172466 (kafka.log.ProducerStateManager)
+[2020-04-17 21:09:27,097] INFO [Log partition=video3-0, dir=/tmp/kafka-logs] Rolled new log segment at offset 1172466 in 3 ms. (kafka.log.Log)
+[2020-04-17 21:18:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2020-04-17 21:28:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2020-04-17 21:38:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2020-04-17 21:48:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2020-04-17 21:58:11,746] INFO [GroupMetadataManager brokerId=0] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
