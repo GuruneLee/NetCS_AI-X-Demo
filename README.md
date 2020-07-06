@@ -4,4 +4,4 @@
 
 ![image](https://user-images.githubusercontent.com/19491757/86563433-5382ae80-bf9f-11ea-870b-fa8324c2e542.png)
 
-AI + X playground 4/17Demo
+AI + X playground 7/09 Demo
