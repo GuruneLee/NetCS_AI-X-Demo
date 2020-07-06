@@ -1,0 +1,18 @@
+FROM ubuntu:18.04
+MAINTAINER Geumseong Yoon <gsyoon@smartx.kr>
+
+#Update & Install wget
+RUN apt-get update
+RUN apt-get install -y wget vim iputils-ping net-tools iproute2 dnsutils git
+RUN apt-get install -y openjdk-8-jdk
+
+#Pull LCH's github repository
+RUN mkdir Kafka
+WORKDIR /Kafka
+RUN git init && git config core.sparse.Checkout true && git remote add -f origin https://github.com/GuruneLee/NetCS_AI-X-Demo && echo “02Edge” >> .git/info/sparse-checkout
+RUN git pull origin master
+WORKDIR /Kafka/02Edge/kafka_2.12-2.2.1
+RUN chmod -R 777 bin/
+
+#Execute broker
+CMD bin/kafka-server-start.sh config/server.properties
