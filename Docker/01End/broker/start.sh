@@ -1,1 +1,1 @@
-sudo docker run -d --net=host --name end-broker geumseongyoon/aix-end-broker:1.0
+sudo docker run -d --net=host --name end-broker dlckdgk4858/aix-end-broker:dev

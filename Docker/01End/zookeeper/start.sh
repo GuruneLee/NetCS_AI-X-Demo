@@ -1,1 +1,1 @@
-sudo docker run -d --net=host --name end-zookeeper geumseongyoon/aix-end-zookeeper:1.0
+sudo docker run -d --net=host --name end-zookeeper dlckdgk4858/aix-end-zookeeper:dev
