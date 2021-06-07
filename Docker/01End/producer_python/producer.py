@@ -5,7 +5,7 @@ import cv2
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
 
-producer = KafkaProducer(bootstrap_servers='192.168.50.100:9092')
+producer = KafkaProducer(bootstrap_servers='172.30.84.94:9092')
 topic = 'video3'
 encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
@@ -37,7 +37,7 @@ def emit_video():
         time.sleep(0.2)
     print()
 
-    video.release()
+    #video.release()
 
     print('done')
 
