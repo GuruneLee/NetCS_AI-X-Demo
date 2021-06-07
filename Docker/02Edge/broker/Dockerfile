@@ -1,5 +1,4 @@
 FROM ubuntu:18.04
-MAINTAINER Geumseong Yoon <gsyoon@smartx.kr>
 
 #Update & Install wget
 RUN apt-get update
@@ -15,4 +14,4 @@ WORKDIR /Kafka/02Edge/kafka_2.12-2.2.1
 RUN chmod -R 777 bin/
 
 #Execute broker
-CMD bin/kafka-server-start.sh config/server.properties
+#CMD bin/kafka-server-start.sh config/server.properties
