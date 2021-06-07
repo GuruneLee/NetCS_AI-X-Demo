@@ -1,1 +1,1 @@
-sudo docker run -d --net=host --name edge-broker geumseongyoon/aix-edge-broker:1.0
+sudo docker run -d --net=host --name edge-broker dlckdgk4858/aix-edge-broker:dev
