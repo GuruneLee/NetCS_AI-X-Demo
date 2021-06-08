@@ -45,4 +45,4 @@ WORKDIR /
 ADD producer.py /
 
 #Execute a python file
-#CMD python producer.py
+CMD python producer.py

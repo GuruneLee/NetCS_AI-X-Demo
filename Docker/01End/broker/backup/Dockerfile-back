@@ -1,4 +1,5 @@
 FROM ubuntu:18.04
+MAINTAINER Geumseong Yoon <gsyoon@smartx.kr>
 
 #Update & Install wget
 RUN apt-get update
@@ -13,8 +14,8 @@ RUN git pull origin master
 WORKDIR /Kafka/01End/kafka_2.12-2.2.1
 RUN chmod -R 777 bin/
 
-#Execute zookeeper
-CMD bin/zookeeper-server-start.sh config/zookeeper.properties
+#Execute broker
+CMD bin/kafka-server-start.sh config/server.properties
 
 
 #git init
@@ -24,3 +25,4 @@ CMD bin/zookeeper-server-start.sh config/zookeeper.properties
 #git pull origin master
 #cd 01End/kafka_2.12-2.2.1/
 #chmod -R 777 bin/
+#bin/kafka-server-start.sh config/server.properties
