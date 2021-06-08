@@ -1,5 +1,4 @@
 FROM ubuntu:18.04
-MAINTAINER Geumseong Yoon <gsyoon@smartx.kr>
 
 #Update & Install wget
 RUN apt-get update
@@ -46,5 +45,5 @@ WORKDIR /
 ADD consumer.py /
 
 #Execute a python file
-CMD python consumer.py
+#CMD python consumer.py
 

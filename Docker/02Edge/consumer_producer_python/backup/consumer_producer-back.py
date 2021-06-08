@@ -9,8 +9,8 @@ import glob
 import os
 import time
 
-consumer2 = KafkaConsumer('video3', bootstrap_servers='172.30.84.94:9092')
-producer = KafkaProducer(bootstrap_servers='172.30.84.61:9092')
+consumer2 = KafkaConsumer('video3', bootstrap_servers='192.168.50.100:9092')
+producer = KafkaProducer(bootstrap_servers='172.30.84.92:9092')
 topic = 'my-topic'
 path3 = "/home/netcs/frames/source3/"
 
