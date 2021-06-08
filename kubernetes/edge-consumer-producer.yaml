@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+        name: aix-edge-service
+        labels:
+                app: aix-edge-service # service's label
+spec:
+        type: NodePort
+        ports:
+                - protocol: TCP
+                  port: 5000 # service's port 
+                  targetPort: 5000 # pod's target port
+        selector:
+                app: aix-edge-consumer-producer # label of wanted pod
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: aix-edge-deployment # deploy's name
+        labels:
+                app: aix-edge-deployment # deploy's label
+spec:
+        replicas: 1 # num of replica
+        selector:
+                matchLabels:
+                        app: aix-edge-consumer-producer # select one of the labels of defined pods
+        template:
+                metadata:
+                        labels:
+                                app: aix-edge-consumer-producer  # define the label of a pod
+                spec:
+                        containers:
+                                - image: dlckdgk4858/aix-edge-consumer-producer:dev
+                                  name: edge-consumer-producer
+                                  ports:
+                                          - containerPort: 5000
+                                  #volumeMounts: (for volume) 
+                        nodeSelector:
+                                machine: gpu01
+                        #volumes: (for volume)
