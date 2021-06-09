@@ -23,12 +23,9 @@ def kafkastream():
     count = 0
     video_num = 0
     now = datetime.datetime.now()
-    #for message in consumer2:
-        #yield (b'--frame\r\n'               b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
-    #array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
-    #image = cv2.imdecode(array,1)
-
-        ## yolo-detection start
+    
+    # yolo-detection start
+    ## preparing the dataset, weight, labels, config
     labelsPath = os.path.sep.join(["yolo-coco", "coco.names"])
     LABELS = open(labelsPath).read().strip().split("\n")
     np.random.seed(42)
@@ -37,24 +34,25 @@ def kafkastream():
     weightsPath = os.path.sep.join(["yolo-coco", "yolov3.weights"])
     configPath = os.path.sep.join(["yolo-coco", "yolov3.cfg"])
 
-
+    ## preparing the dnn using config/weight
     net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 
-        #same as non gpu
+    ## I DON'T KNOW WHAT IT IS
     ln = net.getLayerNames()
     ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
-
+    ## get messages from 'my-topic' topic
+    ## in each loop, whole process is for just one video frame
     for message in consumer2:
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
+        #yield (b'--frame\r\n'
+        #       b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
         array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
         image = cv2.imdecode(array,1)
         (H, W) = image.shape[:2] # image -> img
-        #should be in loop
+        
         blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
         net.setInput(blob)
         start = time.time()
@@ -84,7 +82,7 @@ def kafkastream():
 
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
 
-        #detected image proccessing
+        ## if detect some object, detected image proccessing
         if len(idxs) > 0:
             for i in idxs.flatten():
                 person_flag = 0
@@ -95,19 +93,25 @@ def kafkastream():
                 cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            ### I GEUSS THAT THIS LINE IS FIT TO PRODUCE THE DETECTED IMAGE
 
-        #producing
-        data = cv2.imencode('.jpeg', image)[1].tobytes()
+        ## encode the image to binary
+        data = cv2.imencode('.jpeg', image)[1].tobytes()        
+        
+        ## yield the image-binary for Flask streaming
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n\r\n')
+
+        ## producing
         future = producer.send(topic, data)
         producer.flush()
+        
         try:
             future.get(timeout=10)
         except KafkaError as e:
             print(e)
             break
-
-        #time.sleep(0.2)
-        ## let send an image to new_topic as new_producer
+        
         #cv2.imshow('Image', image)
         #if cv2.waitKey(25) & 0xFF == ord('q'):
         #      break
