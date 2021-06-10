@@ -45,5 +45,5 @@ WORKDIR /
 ADD consumer.py /
 
 #Execute a python file
-#CMD python consumer.py
+CMD python consumer.py
 
