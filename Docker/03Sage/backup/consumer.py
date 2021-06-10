@@ -19,24 +19,20 @@ def kafkastream():
     video_num = 0
     now = datetime.datetime.now()
 
-    vlen = 0
-    
+    len = 0
     video_num = -1
-    frame_array = []
     for message in consumer2:
+        len ++
         yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
         #print("yogi")
         array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
         image = cv2.imdecode(array,1)
         
-        frame_array.append(image)
-        vlen += 1
-
-        if vlen == 100:
-            vlen = 0
-            video_num += 1
-            video_path = result_path + "video_" + str(video_num)+".mp4"
+        if len == 500:
+            len = 0
+            video_num ++
+            video_path = result_path + "video_" + str(video_num)
             h = image.shape[0]
             w = image.shape[1]
             fps = 10
@@ -45,12 +41,8 @@ def kafkastream():
 
             if not out.isOpened():
                 print('File open failed!')
-            else:
-                for i in range(len(frame_array)):
-                    out.write(frame_array[i])
-                out.release()
-                frame_array = []
-                print(video_path + ' is generated\n')
+                cap.release()
+                sys.exit()
         #if cv2.waitKey(25) & 0xFF == ord('q'):
         #    break
                 #count += 1;
