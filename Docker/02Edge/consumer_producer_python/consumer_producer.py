@@ -84,7 +84,9 @@ def kafkastream():
 
         ## if detect some object, detected image proccessing
         if len(idxs) > 0:
+            tags = []
             for i in idxs.flatten():
+                tags.append(LABELS[classIDs[i]])
                 person_flag = 0
                 (x, y) = (boxes[i][0], boxes[i][1])
                 (w, h) = (boxes[i][2], boxes[i][3])
@@ -94,6 +96,17 @@ def kafkastream():
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             ### I GEUSS THAT THIS LINE IS FIT TO PRODUCE THE DETECTED IMAGE
+            if "tvmonitor" in tags:
+                ## producing
+                future = producer.send(topic, cv2.imencode('.jpeg', image)[1].tobytes())
+                producer.flush()
+        
+                try:
+                    future.get(timeout=10)
+                except KafkaError as e:
+                    print(e)
+                    break
+
 
         ## encode the image to binary
         data = cv2.imencode('.jpeg', image)[1].tobytes()        
@@ -102,16 +115,6 @@ def kafkastream():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n\r\n')
 
-        ## producing
-        future = producer.send(topic, data)
-        producer.flush()
-        
-        try:
-            future.get(timeout=10)
-        except KafkaError as e:
-            print(e)
-            break
-        
         #cv2.imshow('Image', image)
         #if cv2.waitKey(25) & 0xFF == ord('q'):
         #      break
