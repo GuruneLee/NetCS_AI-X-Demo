@@ -9,7 +9,7 @@ import os
 import time
 
 consumer2 = KafkaConsumer('my-topic', bootstrap_servers='172.30.84.61:9092', api_version=(0, 10, 1))
-result_path = "/result/video/"
+result_path = "/mnt/video/"
 
 app = Flask(__name__)
 
