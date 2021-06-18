@@ -31,6 +31,8 @@ fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 
 
 def kafkastream():
+    global isStored
+    global isNewVideo
     frame_array = []
     for message in consumer2:
         # 새로운 비디오가 들어왔는지
