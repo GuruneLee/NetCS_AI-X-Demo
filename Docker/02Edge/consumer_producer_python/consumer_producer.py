@@ -136,6 +136,7 @@ def kafkastream():
                         print(e)
                         break
                 # 저장 할 비디오를 다 보냈으면 빈 이미지를 보내서 flag를 세움
+                print("push NULL_IMG")
                 err = producer.send(topic, NULL_IMG_BIN)
                 producer.flush()
                 try:
