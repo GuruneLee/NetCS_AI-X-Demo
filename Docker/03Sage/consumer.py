@@ -35,15 +35,14 @@ def kafkastream():
     global isNewVideo
     frame_array = []
     for message in consumer2:
+        yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
+
         # 새로운 비디오가 들어왔는지
         # 저장이 될 수 있는 상태인지
         if message.value is NULL_IMG_BIN:
-            yield (b'--frame\r\n'
-                b'Content-Type: text/plain\r\n\r\n' + "no object detected" + b'\r\n\r\n')
             isStored = True
         else:
-            yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
             isStored = False
             if not isNewVideo:
                 isNewVideo = True
