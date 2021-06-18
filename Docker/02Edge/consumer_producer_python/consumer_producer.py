@@ -126,9 +126,9 @@ def kafkastream():
                 last = length-1
             # push가 끝날 조건
             # 1) 6번의 x / 2) 길이가 200 이상
-            if last+6 <= length or length >= 5:
+            if last+6 <= length or length >= 15:
                 for bimg in toProduce:
-                    err = producer.send(topic,  NULL_IMG_BIN)
+                    err = producer.send(topic,  bimg)
                     producer.flush()
                     try:
                         err.get(timeout=10)
