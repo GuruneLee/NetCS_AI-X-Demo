@@ -112,7 +112,8 @@ def kafkastream():
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-            isDetected = "person" in tags
+            # 원하는 객체가 발견되면, push상태로 만듦
+            isDetected = "chair" in tags
             if isDetected and not isPushed:
                 isPushed = True
 
@@ -134,9 +135,18 @@ def kafkastream():
                     except KafkaError as e:
                         print(e)
                         break
-                
+                # 저장 할 비디오를 다 보냈으면 빈 이미지를 보내서 flag를 세움
+                err = producer.send(topic, NULL_IMG_BIN)
+                producer.flush()
+                try:
+                    err.get(timeout=10)
+                except KafkaError as e:
+                    print(e)
+                    break
+                # 다시 push할 상태가 아니게 만들기
                 isPushed = False
                 toProduce.clear()
+        # push할 상태가 아닐 땐 항상 빈 이미지를 보냄
         else:
             err = producer.send(topic, NULL_IMG_BIN)
             producer.flush()

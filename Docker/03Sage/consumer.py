@@ -16,23 +16,59 @@ result_path = "/mnt/video/"
 
 app = Flask(__name__)
 
-def kafkastream():
-    print("bcdf")
-    count = 0
-    video_num = 0
-    now = datetime.datetime.now()
+# isStored: 비디오를 저장할지 안할지 결정
+# isNewVideo: 또 다른 비디오의 시작인지 결정
+isStored = False
+isNewVideo = False
 
-    
-    
-    video_num = -1
+# video 포맷
+h = 381
+w = 508
+fps = 10
+fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+
+
+
+def kafkastream():
     frame_array = []
     for message in consumer2:
+        # 새로운 비디오가 들어왔는지
+        # 저장이 될 수 있는 상태인지
         if message.value is NULL_IMG_BIN:
             yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + NULL_IMG_BIN + b'\r\n\r\n')
+                b'Content-Type: text/plain\r\n\r\n' + "no object detected" + b'\r\n\r\n')
+            isStored = True
         else:
             yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
+            isStored = False
+            if isNewVideo is False:
+                isNewVideo = True
+
+        # 새 비디오가 시작됐고 / 아직 저장할 때는 아님
+        if isNewVideo and not isStored:
+            array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
+            image = cv2.imdecode(array,1)
+            frame_array.append(image)
+
+        # 새 비디오가 시작된 상태고 / 저장할 때가 되었음 
+        if isNewVideo and isStored:
+            video_path = time.strftime("%Y%m%d-%H%M%S") + ".mp4"
+            out = cv2.VideoWriter(video_path, fourcc, fps, (w,h))
+            if not out.isOpened():
+                print('File open failed!')
+            else:
+                for i in range(len(frame_array)):
+                    out.write(frame_array[i])
+                out.release()
+                frame_array.clear()
+                print(video_path + ' is generated\n')
+            isNewVideo = False
+        
+        # 새 비디오가 시작되지 않았고 / 저장할 때도 아님
+        # 새 비디오가 시작되지 않았고 / 저장할 때임
+
+
         # #print("yogi")
         # array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
         # image = cv2.imdecode(array,1)
