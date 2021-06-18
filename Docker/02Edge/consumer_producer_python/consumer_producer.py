@@ -44,11 +44,17 @@ def kafkastream():
     ln = net.getLayerNames()
     ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
+
+    # toProduce: 이미지 바이너리를 담을 리스트
+    # isPushed: 담기 시작했는지 알리는 flag
+    # last: 마지막으로 담긴 객체의 index
+    # len: toProduce의 사이즈
+
     ## get messages from 'my-topic' topic
     ## in each loop, whole process is for just one video frame
     for message in consumer2:
-        #yield (b'--frame\r\n'
-        #       b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
+        
+        # 한 장의 프레임에서 yolo를 이용해 object detection하는 부분
         array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
         image = cv2.imdecode(array,1)
         (H, W) = image.shape[:2] # image -> img
@@ -82,11 +88,12 @@ def kafkastream():
 
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
 
-        ## if detect some object, detected image proccessing
+        # object가 디텍팅 되면, 그 위에 박싱을 하는 부분
         if len(idxs) > 0:
-            tags = []
+            # 프레임에서 발견된 tag의 종류 저장
+            tags = set()
             for i in idxs.flatten():
-                tags.append(LABELS[classIDs[i]])
+                tags.add(LABELS[classIDs[i]])
                 person_flag = 0
                 (x, y) = (boxes[i][0], boxes[i][1])
                 (w, h) = (boxes[i][2], boxes[i][3])
@@ -96,7 +103,7 @@ def kafkastream():
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             ### I GEUSS THAT THIS LINE IS FIT TO PRODUCE THE DETECTED IMAGE
-            if "tvmonitor" in tags:
+            if "chair" in tags:
                 ## producing
                 future = producer.send(topic, cv2.imencode('.jpeg', image)[1].tobytes())
                 producer.flush()
@@ -115,9 +122,6 @@ def kafkastream():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + data + b'\r\n\r\n')
 
-        #cv2.imshow('Image', image)
-        #if cv2.waitKey(25) & 0xFF == ord('q'):
-        #      break
 
 @app.route('/video3')
 def video3():
