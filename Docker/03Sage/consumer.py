@@ -47,6 +47,8 @@ def kafkastream():
             if not isNewVideo:
                 isNewVideo = True
 
+        print(str(isNewVideo) + ', ' + str(isStored))
+        
         # 새 비디오가 시작됐고 / 아직 저장할 때는 아님
         if isNewVideo and not isStored:
             array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
