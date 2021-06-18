@@ -111,7 +111,7 @@ def kafkastream():
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-            isDetected = "chair" in tags
+            isDetected = "person" in tags
             if isDetected and not isPushed:
                 isPushed = True
 
