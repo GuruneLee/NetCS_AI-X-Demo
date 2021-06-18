@@ -9,7 +9,8 @@ import glob
 import os
 import time
 
-NULL_IMG_BIN = np.zeros((100,100,3), dtype=np.uint8)
+NULL_IMG = np.zeros((100,100,3), dtype=np.uint8)
+NULL_IMG_BIN = cv2.imencode('.jpeg', NULL_IMG)[1].tobytes()
 
 consumer2 = KafkaConsumer('video3', bootstrap_servers='172.30.84.94:9092')
 producer = KafkaProducer(bootstrap_servers='172.30.84.61:9092')
