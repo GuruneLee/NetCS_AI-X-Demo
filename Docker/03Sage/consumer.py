@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*- 
+
 from flask import Flask, Response
 from kafka import KafkaConsumer
 import cv2
@@ -17,12 +17,11 @@ result_path = "/mnt/video/"
 
 app = Flask(__name__)
 
-# isStored: 비디오를 저장할지 안할지 결정
-# isNewVideo: 또 다른 비디오의 시작인지 결정
+
 isStored = False
 isNewVideo = False
 
-# video 포맷
+# video
 h = 381
 w = 508
 fps = 10
@@ -38,8 +37,8 @@ def kafkastream():
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
 
-        # 새로운 비디오가 들어왔는지
-        # 저장이 될 수 있는 상태인지
+        # check if new video is started
+        # check if frames to be stored
         if message.value is NULL_IMG_BIN:
             isStored = True
         else:
@@ -48,14 +47,14 @@ def kafkastream():
                 isNewVideo = True
 
         print(str(isNewVideo) + ', ' + str(isStored))
+
         
-        # 새 비디오가 시작됐고 / 아직 저장할 때는 아님
         if isNewVideo and not isStored:
             array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
             image = cv2.imdecode(array,1)
             frame_array.append(image)
 
-        # 새 비디오가 시작된 상태고 / 저장할 때가 되었음 
+      
         if isNewVideo and isStored:
             video_path = time.strftime("%Y%m%d-%H%M%S") + ".mp4"
             out = cv2.VideoWriter(video_path, fourcc, fps, (w,h))
@@ -69,8 +68,8 @@ def kafkastream():
                 print(video_path + ' is generated\n')
             isNewVideo = False
         
-        # 새 비디오가 시작되지 않았고 / 저장할 때도 아님
-        # 새 비디오가 시작되지 않았고 / 저장할 때임
+
+
 
 
         # #print("yogi")
