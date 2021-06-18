@@ -1,1 +1,1 @@
-sudo docker run -d --net=host --name sage-consumer geumseongyoon/aix-sage-consumer:1.0
+sudo docker run -d --net=host --name storage-api dlckdgk4858/aix-storage-api:dev 

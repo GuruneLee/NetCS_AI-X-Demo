@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+        name: aix-storage-service
+        labels:
+                app: aix-storage # service's label
+spec:
+        type: NodePort
+        ports:
+                - protocol: TCP
+                  port: 5000 # service's port 
+                  targetPort: 5000 # pod's target port
+        selector:
+                app: aix-storage-api # label of wanted pod
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+        name: storage-pv-claim
+        labels:
+                app: aix-storage
+spec:
+        storageClassName: rook-ceph-block
+        accessModes:
+                - ReadWriteOnce
+        resources:
+                requests:
+                        storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+        name: aix-storage-deployment # deploy's name
+        labels:
+                app: aix-storage # deploy's label
+spec:
+        replicas: 1 # num of replica
+        selector:
+                matchLabels:
+                        app: aix-storage-api # select one of the labels of defined pods
+        template:
+                metadata:
+                        labels:
+                                app: aix-storage-api  # define the label of a pod
+                spec:
+                        containers:
+                                - image: dlckdgk4858/aix-storage-api:dev
+                                  imagePullPolicy: Always
+                                  name: storage-api
+                                  ports:
+                                          - containerPort: 5000
+                                  volumeMounts:
+                                          - name: storage-pv
+                                            mountPath: /mnt/video
+                        volumes:
+                                - name: storage-pv
+                                  persistentVolumeClaim:
+                                          claimName: storage-pv-claim

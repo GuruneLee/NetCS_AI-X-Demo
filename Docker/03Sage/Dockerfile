@@ -1,5 +1,4 @@
 FROM ubuntu:18.04
-MAINTAINER Geumseong Yoon <gsyoon@smartx.kr>
 
 #Update & Install wget
 RUN apt-get update
