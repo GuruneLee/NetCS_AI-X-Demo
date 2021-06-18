@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*- 
 from flask import Flask, Response
 from kafka import KafkaConsumer
 import cv2
