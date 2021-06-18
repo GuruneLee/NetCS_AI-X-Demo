@@ -46,7 +46,7 @@ def kafkastream():
             if not isNewVideo:
                 isNewVideo = True
 
-        print(str(isNewVideo) + ', ' + str(isStored))
+        # print(str(isNewVideo) + ', ' + str(isStored))
 
         
         if isNewVideo and not isStored:
@@ -56,6 +56,7 @@ def kafkastream():
 
       
         if isNewVideo and isStored:
+            print("start to store a video")
             video_path = time.strftime("%Y%m%d-%H%M%S") + ".mp4"
             out = cv2.VideoWriter(video_path, fourcc, fps, (w,h))
             if not out.isOpened():
