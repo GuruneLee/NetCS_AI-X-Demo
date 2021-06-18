@@ -127,9 +127,8 @@ def kafkastream():
             # push가 끝날 조건
             # 1) 6번의 x / 2) 길이가 200 이상
             if last+6 <= length or length >= 5:
-                print("push frame")
                 for bimg in toProduce:
-                    err = producer.send(topic, bimg)
+                    err = producer.send(topic,  NULL_IMG_BIN)
                     producer.flush()
                     try:
                         err.get(timeout=10)
@@ -137,7 +136,6 @@ def kafkastream():
                         print(e)
                         break
                 # 저장 할 비디오를 다 보냈으면 빈 이미지를 보내서 flag를 세움
-                print("push NULL_IMG")
                 err = producer.send(topic, NULL_IMG_BIN)
                 producer.flush()
                 try:

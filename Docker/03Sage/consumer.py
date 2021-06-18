@@ -36,10 +36,10 @@ def kafkastream():
     for message in consumer2:
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
-
+        print(message.value)
         # check if new video is started
         # check if frames to be stored
-        if message.value is NULL_IMG_BIN:
+        if message.value == NULL_IMG_BIN:
             isStored = True
         else:
             isStored = False
