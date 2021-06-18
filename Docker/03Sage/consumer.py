@@ -65,7 +65,7 @@ def kafkastream():
                 for i in range(len(frame_array)):
                     out.write(frame_array[i])
                 out.release()
-                frame_array.clear()
+                frame_array = []
                 print(video_path + ' is generated\n')
             isNewVideo = False
         
