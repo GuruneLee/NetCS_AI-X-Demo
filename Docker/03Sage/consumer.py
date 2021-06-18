@@ -43,7 +43,7 @@ def kafkastream():
             yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
             isStored = False
-            if isNewVideo is False:
+            if not isNewVideo:
                 isNewVideo = True
 
         # 새 비디오가 시작됐고 / 아직 저장할 때는 아님
