@@ -25,7 +25,7 @@ isNewVideo = False
 h = 381
 w = 508
 fps = 10
-fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+fourcc = cv2.VideoWriter_fourcc(*'MPEG')
 
 
 
