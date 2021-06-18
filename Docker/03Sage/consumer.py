@@ -36,10 +36,12 @@ def kafkastream():
     for message in consumer2:
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
-        print(message.value)
+        array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
+        image = cv2.imdecode(array,1)
         # check if new video is started
         # check if frames to be stored
-        if message.value == NULL_IMG_BIN:
+        if image is None:
+            print("image is empty")
             isStored = True
         else:
             isStored = False
@@ -50,8 +52,6 @@ def kafkastream():
 
         
         if isNewVideo and not isStored:
-            array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
-            image = cv2.imdecode(array,1)
             frame_array.append(image)
 
       
