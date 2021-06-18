@@ -21,7 +21,7 @@ app = Flask(__name__)
 
 
 def kafkastream():
-    print("bcdf")
+    print("kafkastream started")
 
     count = 0
     video_num = 0
@@ -127,6 +127,7 @@ def kafkastream():
             # push가 끝날 조건
             # 1) 6번의 x / 2) 길이가 200 이상
             if last+6 <= length or length >= 5:
+                print("push frame")
                 for bimg in toProduce:
                     err = producer.send(topic, bimg)
                     producer.flush()
