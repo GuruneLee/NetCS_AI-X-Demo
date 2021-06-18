@@ -9,7 +9,7 @@ import glob
 import os
 import time
 
-NULL_BIN = /x00
+NULL_IMG_BIN = np.zeros((100,100,3), dtype=np.uint8)
 
 consumer2 = KafkaConsumer('video3', bootstrap_servers='172.30.84.94:9092')
 producer = KafkaProducer(bootstrap_servers='172.30.84.61:9092')
@@ -137,7 +137,7 @@ def kafkastream():
                 isPushed = False
                 toProduce.clear()
         else:
-            err = producer.send(topic, NULL_BIN)
+            err = producer.send(topic, NULL_IMG_BIN)
             producer.flush()
             try:
                 err.get(timeout=10)

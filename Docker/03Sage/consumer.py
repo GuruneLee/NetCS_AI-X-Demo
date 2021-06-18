@@ -8,6 +8,8 @@ import glob
 import os
 import time
 
+NULL_IMG_BIN = np.zeros((100,100,3), dtype=np.uint8)
+
 consumer2 = KafkaConsumer('my-topic', bootstrap_servers='172.30.84.61:9092', api_version=(0, 10, 1))
 result_path = "/mnt/video/"
 
@@ -19,14 +21,14 @@ def kafkastream():
     video_num = 0
     now = datetime.datetime.now()
 
-    vlen = 0
+    
     
     video_num = -1
     frame_array = []
     for message in consumer2:
-        if message.value is /x00:
+        if message.value is NULL_IMG_BIN:
             yield (b'--frame\r\n'
-                b'Content-Type: text/plain\r\n\r\n' + "null value" + b'\r\n\r\n')
+                b'Content-Type: image/jpeg\r\n\r\n' + NULL_IMG_BIN + b'\r\n\r\n')
         else:
             yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
