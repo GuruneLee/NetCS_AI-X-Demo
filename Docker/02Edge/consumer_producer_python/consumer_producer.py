@@ -9,6 +9,8 @@ import glob
 import os
 import time
 
+NULL_BIN = /x00
+
 consumer2 = KafkaConsumer('video3', bootstrap_servers='172.30.84.94:9092')
 producer = KafkaProducer(bootstrap_servers='172.30.84.61:9092')
 topic = 'my-topic'
@@ -49,6 +51,10 @@ def kafkastream():
     # isPushed: 담기 시작했는지 알리는 flag
     # last: 마지막으로 담긴 객체의 index
     # len: toProduce의 사이즈
+    toProduce = []
+    isPushed = False
+    last = -1
+    length = 0
 
     ## get messages from 'my-topic' topic
     ## in each loop, whole process is for just one video frame
@@ -85,13 +91,15 @@ def kafkastream():
                     boxes.append([x, y, int(width), int(height)])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
-
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.3)
 
         # object가 디텍팅 되면, 그 위에 박싱을 하는 부분
+        ## isDetected: 원하는 객체가 탐지됐는가를 담는 flag 
+        isDetected = False
         if len(idxs) > 0:
             # 프레임에서 발견된 tag의 종류 저장
             tags = set()
+
             for i in idxs.flatten():
                 tags.add(LABELS[classIDs[i]])
                 person_flag = 0
@@ -102,17 +110,52 @@ def kafkastream():
                 cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
                 text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-            ### I GEUSS THAT THIS LINE IS FIT TO PRODUCE THE DETECTED IMAGE
-            if "chair" in tags:
-                ## producing
-                future = producer.send(topic, cv2.imencode('.jpeg', image)[1].tobytes())
-                producer.flush()
+
+            isDetected = "chair" in tags
+            if isDetected and not isPushed:
+                isPushed = True
+
+        # push가 시작되면 모든 프레임을 append함  
+        # last와 length를 업데이트  
+        if isPushed:
+            toProduce.append(cv2.imencode('.jpeg', image)[1].tobytes())
+            length = len(toProduce)
+            if isDetected:
+                last = length-1
+            # push가 끝날 조건
+            # 1) 6번의 x / 2) 길이가 200 이상
+            if last+6 <= length or length >= 200:
+                for bimg in toProduce:
+                    err = producer.send(topic, bimg)
+                    producer.flush()
+                    try:
+                        err.get(timeout=10)
+                    except KafkaError as e:
+                        print(e)
+                        break
+                
+                isPushed = False
+                toProduce.clear()
+        else:
+            err = producer.send(topic, NULL_BIN)
+            producer.flush()
+            try:
+                err.get(timeout=10)
+            except KafkaError as e:
+                print(e)
+                break
+
+            # ### I GEUSS THAT THIS LINE IS FIT TO PRODUCE THE DETECTED IMAGE
+            # if "chair" in tags:
+            #     ## producing
+            #     future = producer.send(topic, cv2.imencode('.jpeg', image)[1].tobytes())
+            #     producer.flush()
         
-                try:
-                    future.get(timeout=10)
-                except KafkaError as e:
-                    print(e)
-                    break
+            #     try:
+            #         future.get(timeout=10)
+            #     except KafkaError as e:
+            #         print(e)
+            #         break
 
 
         ## encode the image to binary
