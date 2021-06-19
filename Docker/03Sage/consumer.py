@@ -61,8 +61,8 @@ def kafkastream():
             h = 381
             w = 508
             fps = 10
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            video_path = result_path + time.strftime("%Y%m%d-%H%M%S") + ".avi"
+            fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+            video_path = result_path + time.strftime("%Y%m%d-%H%M%S") + ".mp4"
             out = cv2.VideoWriter(video_path, fourcc, fps, (w,h))
             if not out.isOpened():
                 print('File open failed!')
