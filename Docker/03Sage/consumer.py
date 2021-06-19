@@ -52,9 +52,10 @@ def kafkastream():
         
         if isNewVideo and not isStored:
             print(len(frame_array))
-            array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
-            image = cv2.imdecode(array,1)
-            frame_array.append(image)
+            if message.value != NULL_IMG_BIN:
+                array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
+                image = cv2.imdecode(array,1)
+                frame_array.append(image)
 
       
         if isNewVideo and isStored:
@@ -69,7 +70,6 @@ def kafkastream():
                 print('File open failed!')
             else:
                 for i in range(len(frame_array)):
-                    print(len(frame_array))
                     out.write(frame_array[i])
                 out.release()
                 frame_array = []
