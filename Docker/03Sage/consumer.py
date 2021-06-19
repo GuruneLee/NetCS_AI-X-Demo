@@ -22,10 +22,10 @@ isStored = False
 isNewVideo = False
 
 # video
-h = 381
-w = 508
-fps = 10
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# h = 381
+# w = 508
+# fps = 10
+# fourcc = cv2.VideoWriter_fourcc(*'XVID')
 
 
 
@@ -58,12 +58,17 @@ def kafkastream():
       
         if isNewVideo and isStored:
             print("start to store a video")
+            h = 381
+            w = 508
+            fps = 10
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
             video_path = result_path + time.strftime("%Y%m%d-%H%M%S") + ".avi"
             out = cv2.VideoWriter(video_path, fourcc, fps, (w,h))
             if not out.isOpened():
                 print('File open failed!')
             else:
                 for i in range(len(frame_array)):
+                    print(len(frame_array))
                     out.write(frame_array[i])
                 out.release()
                 frame_array = []
