@@ -51,6 +51,7 @@ def kafkastream():
 
         
         if isNewVideo and not isStored:
+            print(len(frame_array))
             array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
             image = cv2.imdecode(array,1)
             frame_array.append(image)
