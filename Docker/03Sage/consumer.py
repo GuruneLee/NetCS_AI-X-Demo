@@ -33,6 +33,10 @@ def kafkastream():
     global isStored
     global isNewVideo
     frame_array = []
+
+    cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty("Image",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+
     for message in consumer2:
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + message.value + b'\r\n\r\n')
@@ -51,11 +55,11 @@ def kafkastream():
 
         
         if isNewVideo and not isStored:
-            print(len(frame_array))
             if message.value != NULL_IMG_BIN:
                 array = np.frombuffer( message.value, dtype = np.dtype('uint8'))
                 image = cv2.imdecode(array,1)
                 frame_array.append(image)
+                cv2.imshow('Image', image)
 
       
         if isNewVideo and isStored:
