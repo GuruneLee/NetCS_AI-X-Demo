@@ -59,6 +59,8 @@ def kafkastream():
 
     ## get messages from 'my-topic' topic
     ## in each loop, whole process is for just one video frame
+    cnt = 0
+    video_arr = []
     for message in consumer2:
         
         # 한 장의 프레임에서 yolo를 이용해 object detection하는 부분
@@ -114,9 +116,19 @@ def kafkastream():
 
             # 원하는 객체가 발견되면, push상태로 만듦
             isDetected = "chair" in tags
+            if isDetected:
+                cnt += 1
+                video_arr.append(image)
             if isDetected and not isPushed:
                 isPushed = True
-
+        
+        if cnt == 150:
+            cnt = 0
+            out = cv2.VideoWriter("/mnt/"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))
+            for i in range(len(video_arr)):
+                out.write(tmp_img)
+            out.release()
+            video_arr.clear()
         # push가 시작되면 모든 프레임을 append함  
         # last와 length를 업데이트  
         if isPushed:
@@ -130,7 +142,7 @@ def kafkastream():
             if last+6 <= length or length >= 150:
                 
                 # 여기서 저장해보자
-                out = cv2.VideoWriter("/mnt/"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))                
+                #out = cv2.VideoWriter("/mnt/"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))                
 
 
                 for bimg in toProduce:
@@ -141,10 +153,10 @@ def kafkastream():
                     except KafkaError as e:
                         print(e)
                         break
-                    array = np.frombuffer( bimg, dtype = np.dtype('uint8'))
-                    tmp_img = cv2.imdecode(array,1)
-                    out.write(tmp_img)
-                out.release()
+                    #array = np.frombuffer( bimg, dtype = np.dtype('uint8'))
+                    #tmp_img = cv2.imdecode(array,1)
+                    #out.write(tmp_img)
+                #out.release()
                 # 저장 할 비디오를 다 보냈으면 빈 이미지를 보내서 flag를 세움
                 err = producer.send(topic, NULL_IMG_BIN)
                 producer.flush()
