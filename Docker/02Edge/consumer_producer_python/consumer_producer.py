@@ -119,7 +119,10 @@ def kafkastream():
 
         # push가 시작되면 모든 프레임을 append함  
         # last와 length를 업데이트  
+        cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
+        cv2.setWindowProperty("Image",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
         if isPushed:
+            
             toProduce.append(cv2.imencode('.jpeg', image)[1].tobytes())
             length = len(toProduce)
             if isDetected:
