@@ -119,8 +119,6 @@ def kafkastream():
 
         # push가 시작되면 모든 프레임을 append함  
         # last와 length를 업데이트  
-        cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
-        cv2.setWindowProperty("Image",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
         if isPushed:
             
             toProduce.append(cv2.imencode('.jpeg', image)[1].tobytes())
@@ -130,6 +128,11 @@ def kafkastream():
             # push가 끝날 조건
             # 1) 6번의 x / 2) 길이가 200 이상
             if last+6 <= length or length >= 150:
+                
+                # 여기서 저장해보자
+                out = cv2.VideoWriter("/home/netai/NetCS_AI-X-Demo/Docker/02Edge/consumer_producer_python/test-video"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))                
+
+
                 for bimg in toProduce:
                     err = producer.send(topic,  bimg)
                     producer.flush()
@@ -138,6 +141,10 @@ def kafkastream():
                     except KafkaError as e:
                         print(e)
                         break
+                    array = np.frombuffer( bimg, dtype = np.dtype('uint8'))
+                    tmp_img = cv2.imdecode(array,1)
+                    out.write(tmp_img)
+                out.release()
                 # 저장 할 비디오를 다 보냈으면 빈 이미지를 보내서 flag를 세움
                 err = producer.send(topic, NULL_IMG_BIN)
                 producer.flush()
