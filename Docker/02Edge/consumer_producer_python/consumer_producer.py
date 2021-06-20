@@ -126,7 +126,7 @@ def kafkastream():
             cnt = 0
             out = cv2.VideoWriter("/mnt/"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))
             for i in range(len(video_arr)):
-                out.write(tmp_img)
+                out.write(video_arr[i])
             out.release()
             video_arr.clear()
         # push가 시작되면 모든 프레임을 append함  
