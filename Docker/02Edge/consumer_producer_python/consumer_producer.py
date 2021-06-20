@@ -130,7 +130,7 @@ def kafkastream():
             if last+6 <= length or length >= 150:
                 
                 # 여기서 저장해보자
-                out = cv2.VideoWriter("/home/netai/NetCS_AI-X-Demo/Docker/02Edge/consumer_producer_python/test-video"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))                
+                out = cv2.VideoWriter("/mnt/"+time.strftime("%Y%m%d-%H%M%S") + ".mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (image.shape[0], image.shape[1]))                
 
 
                 for bimg in toProduce:
